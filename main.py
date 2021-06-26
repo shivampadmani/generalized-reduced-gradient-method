@@ -19,30 +19,50 @@ if __name__ == '__main__':
         x0 = 3 # This are coordinates of initial guess
         y0 = 2
         x, y = symbols('x y')
+        h = symbols('h')
         objfun = x ** 2 + y ** 2 + 2 * x  # This is our objective function
-        variables = [x,y]
-        itervalue = [[x0,y0],]
+        # variables = [x,y]
         delfunx = Derivative(objfun,x).doit()
         delfuny = Derivative(objfun,y).doit()
+
         templist = [[delfunx.subs([(x, x0), (y, y0)]),delfuny.subs([(x, x0), (y, y0)])],]  # List of list of gradients of obj function
-        rows, cols = (10, 2)
-        nextvalue = [[0,0]] * 100#[[0 for i in range(cols)] for j in range(rows)]
-        h = symbols('h')
+        itervalue = [[x0, y0], ]
+        nextvalue = [[1, 1], ]  # No significance of [1,1] only to create 2d array like list
+        nextvalue[0] = [itervalue[0][0] + h * templist[0][0], itervalue[0][1] + h * templist[0][1]]
+        print("nextvalue is ",nextvalue)
+        step_size = newton(nextvalue[0],objfun)
+
         k = 1
-        iteration_no = 0
-        while k == 1: #assumed 10 iteration required taking index 0 to 9
-            print("Iteration No. ",iteration_no+1)
-            # time.sleep(1)
-            nextvalue[iteration_no][0] = itervalue[iteration_no][0] + h * templist[iteration_no][0]
-            nextvalue[iteration_no][1] = itervalue[iteration_no][1] + h * templist[iteration_no][1]
-            step_size = newton(nextvalue[iteration_no],objfun) #stepsize of iteration
-            itervalue.append([nextvalue[iteration_no][0].subs(h, step_size), nextvalue[iteration_no][1].subs(h, step_size)])
-            templist.append([delfunx.subs(x,itervalue[iteration_no][0]),delfuny.subs(y,itervalue[iteration_no][1])])
-            if templist[iteration_no][0] == 0 and templist[iteration_no][1] == 0:
-                print("Solution obtained:")
+        i = 0
+        while k == 1:
+            print("Iteration number :" , i+1 )
+            itervalue.append([nextvalue[i][0].subs(h, step_size), nextvalue[i][1].subs(h, step_size)])
+            print("itervalue is", itervalue)
+            templist.append([delfunx.subs([(x, itervalue[i][0]), (y, itervalue[i][1])]),
+                             delfuny.subs([(x, itervalue[i][0]), (y, itervalue[i][1])])])
+            print("templist is :", templist)
+            nextvalue.append([itervalue[i][0] + h * templist[i][0], itervalue[i][1] + h * templist[i][1]])
+            print("nextvalue is ",nextvalue)
+            i=i+1
+            if i == 3:
                 break
-            # print(f"Step size (h) for iteration no. {iteration_no+1} is {step_size}")
-            # print("itervalue" , itervalue)
-            # print("templist",templist)
-            iteration_no += 1
-        print(nextvalue[-1][0].subs(h,step_size),nextvalue[-1][1].subs(h,step_size))
+
+
+
+        # k = 1
+        # iteration_no = 0
+        # while k == 1: #assumed 10 iteration required taking index 0 to 9
+        #     print("Iteration No. ",iteration_no+1)
+        #     time.sleep(1)
+        #     nextvalue.append([ itervalue[iteration_no][0] + h * templist[iteration_no][0] , itervalue[iteration_no][1] + h * templist[iteration_no][1]])
+        #     step_size = newton(nextvalue[iteration_no],objfun) #stepsize of iteration
+        #     print("h is : ",step_size)
+        #     itervalue.append([nextvalue[iteration_no][0].subs(h, step_size), nextvalue[iteration_no][1].subs(h, step_size)])
+        #     templist.append([delfunx.subs(x,itervalue[iteration_no][0]),delfuny.subs(y,itervalue[iteration_no][1])])
+        #     if templist[iteration_no][0] == 0 and templist[iteration_no][1] == 0:
+        #         # print("Solution obtained:")
+        #         break
+        #     # print(f"Step size (h) for iteration no. {iteration_no+1} is {step_size}")
+        #     # print("itervalue" , itervalue)
+        #     print("templist",templist)
+        #     iteration_no += 1
