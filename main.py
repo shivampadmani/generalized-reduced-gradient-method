@@ -2,8 +2,9 @@ from sympy import *
 import time
 import math
 import numpy as np
+reg = "Newton Running"
 def newton(var,objfun,x0 = 1):  #x0 is initial value given to NR method
-    print(var)
+    #var is a + b *h form
     functionh = objfun.subs([(x,var[0]),(y,var[1])])
     delfunctionh = Derivative(functionh,h).doit()
     max_iter = 50 #maximum iteration in NR method can be setted here
@@ -14,7 +15,9 @@ def newton(var,objfun,x0 = 1):  #x0 is initial value given to NR method
         # To increase the number of iteration you also have to increase the number of entries in ary.
         ary[i+1] = ary[i] - (functionh.subs(h,ary[i]))/(delfunctionh.subs(h,ary[i]))
         step_size = float(ary[i+1])
+    print(reg)
     return step_size
+
 if __name__ == '__main__':
         x0 = 3 # This are coordinates of initial guess
         y0 = 2
@@ -29,23 +32,47 @@ if __name__ == '__main__':
         itervalue = [[x0, y0], ]
         nextvalue = [[1, 1], ]  # No significance of [1,1] only to create 2d array like list
         nextvalue[0] = [itervalue[0][0] + h * templist[0][0], itervalue[0][1] + h * templist[0][1]]
-        print("nextvalue is ",nextvalue)
-        step_size = newton(nextvalue[0],objfun)
+        print("0. itervalue is", itervalue)
+        print("0. templist is :", templist)
+        print("0. nextvalue is ", nextvalue)
 
+        step_size = [1,] #to initialize the array of step_sizes
+        step_size[0] = newton(nextvalue[0],objfun)
+        print("0. step_size is",step_size)
+
+        itervalue.append([nextvalue[0][0].subs(h, step_size[0]), nextvalue[0][1].subs(h, step_size[0])])
+        print("1. itervalue is", itervalue)
+        templist.append([delfunx.subs([(x, itervalue[1][0]), (y, itervalue[1][1])]),
+                         delfuny.subs([(x, itervalue[1][0]), (y, itervalue[1][1])])])
+        print("1. templist is :", templist)
+        nextvalue.append([itervalue[1][0] + h * templist[1][0], itervalue[1][1] + h * templist[1][1]])
+        print("1. nextvalue is ", nextvalue)
+        step_size.append(newton(nextvalue[1], objfun))
+        print("1. step_size is ",step_size[1])
+
+        itervalue.append([nextvalue[1][0].subs(h, step_size[1]), nextvalue[1][1].subs(h, step_size[1])])
+        print("2. itervalue is", itervalue)
+        templist.append([delfunx.subs([(x, itervalue[2][0]), (y, itervalue[2][1])]),
+                         delfuny.subs([(x, itervalue[2][0]), (y, itervalue[2][1])])])
+        print("2. templist is :", templist)
+        nextvalue.append([itervalue[2][0] + h * templist[2][0], itervalue[2][1] + h * templist[2][1]])
+        print("2. nextvalue is ", nextvalue)
+        step_size.append(newton(nextvalue[2], objfun))
         k = 1
-        i = 0
-        while k == 1:
-            print("Iteration number :" , i+1 )
-            itervalue.append([nextvalue[i][0].subs(h, step_size), nextvalue[i][1].subs(h, step_size)])
-            print("itervalue is", itervalue)
-            templist.append([delfunx.subs([(x, itervalue[i][0]), (y, itervalue[i][1])]),
-                             delfuny.subs([(x, itervalue[i][0]), (y, itervalue[i][1])])])
-            print("templist is :", templist)
-            nextvalue.append([itervalue[i][0] + h * templist[i][0], itervalue[i][1] + h * templist[i][1]])
-            print("nextvalue is ",nextvalue)
-            i=i+1
-            if i == 3:
-                break
+        i = 1
+        # while k == 1:
+        #     print("Iteration number :" , i+2 )
+        #     step_size[i] =  newton(nextvalue[i],objfun)
+        #     itervalue.append([nextvalue[i][0].subs(h, step_size[i]), nextvalue[i][1].subs(h, step_size[i])])
+        #     print("itervalue is", itervalue)
+        #     templist.append([delfunx.subs([(x, itervalue[i][0]), (y, itervalue[i][1])]),
+        #                      delfuny.subs([(x, itervalue[i][0]), (y, itervalue[i][1])])])
+        #     print("templist is :", templist)
+        #     nextvalue.append([itervalue[i][0] + h * templist[i][0], itervalue[i][1] + h * templist[i][1]])
+        #     print("nextvalue is ",nextvalue,sep="\n")
+        #     i=i+1
+        #     if i == 60:
+        #         break
 
 
 
